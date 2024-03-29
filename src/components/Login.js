@@ -2,6 +2,9 @@ import React, { useRef, useState } from "react";
 import Header from "./Header";
 import img from "../assets/netflix 1.jpg";
 import { checkValidData } from "../utils/Validate";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../utils/Firebase";
 
 const Login = () => {
   const email = useRef(null);
@@ -12,20 +15,47 @@ const Login = () => {
   const handleButtonClick = () => {
     const errorMessage = checkValidData(
       email.current.value,
-      password.current.value,
+      password.current.value
       // name.current.value
     );
     setErrorMessage(errorMessage);
-    if(errorMessage) return;
+    if (errorMessage) return;
 
     // Sign In / Sign Up Logic
-    
-    if(!isSignInForm){
-      // Sign Up Logic 
-    }else{
-      // Sign In Logic 
-    }
 
+    if (!isSignInForm) {
+      // Sign Up Logic
+      createUserWithEmailAndPassword(
+        auth,
+        email.current.value,
+        password.current.value
+      )
+        .then((userCredential) => {
+          const user = userCredential.user;
+          console.log(user);
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          setErrorMessage(errorCode + "-" + errorMessage);
+        });
+    } else {
+      // Sign In Logic
+      signInWithEmailAndPassword(
+        auth,
+        email.current.value,
+        password.current.value
+      )
+        .then((userCredential) => {
+          const user = userCredential.user;
+          console.log(user);
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          console.log(errorCode + "-" + errorMessage);
+        });
+    }
   };
 
   const [isSignInForm, setisSignInForm] = useState(true);
